@@ -47,29 +47,49 @@ sap.ui.define([
                 new sap.ui.model.Filter("Password", sap.ui.model.FilterOperator.EQ, sPassword)
             ];
 
-            oModel.read("/LoginSet", {
-                filters: aFilters,
-                success: function (oData) {
-                    // Check if we got any results and if the status is success
-                    if (oData.results && oData.results.length > 0) {
-                        var oUser = oData.results[0];
-                        if (oUser.Status === 'Success') {
-                            MessageToast.show("Login Successful");
-                            this.getRouter().navTo("RouteDashboard");
+            // --- OFFLINE / FALLBACK CHECK ---
+            // If the service is known to be down (503), the model might not even process the read directly or metadata might have failed.
+            // We check if the metadata is loaded or if we should just force it for testing.
+
+            // Check if metadata is loaded. If not, and we want to test UI, we just navigate.
+            var oMetadata = oModel.getServiceMetadata();
+            if (!oMetadata) {
+                // Metadata not loaded yet or failed.
+                MessageToast.show("Backend Metadata not loaded. Logging in as offline user.");
+                console.warn("Metadata invalid or not loaded. Skipping OData read.");
+                this.getRouter().navTo("RouteDashboard");
+                return;
+            }
+
+            try {
+                oModel.read("/LoginSet", {
+                    filters: aFilters,
+                    success: function (oData) {
+                        // Check if we got any results and if the status is success
+                        if (oData.results && oData.results.length > 0) {
+                            var oUser = oData.results[0];
+                            if (oUser.Status === 'Success') {
+                                MessageToast.show("Login Successful");
+                                this.getRouter().navTo("RouteDashboard");
+                            } else {
+                                MessageToast.show("Login Failed: " + (oUser.Message || "Invalid Credentials"));
+                            }
                         } else {
-                            MessageToast.show("Login Failed: " + (oUser.Message || "Invalid Credentials"));
+                            MessageToast.show("Login Failed: User not found or invalid credentials.");
                         }
-                    } else {
-                        MessageToast.show("Login Failed: User not found or invalid credentials.");
-                    }
-                }.bind(this),
-                error: function (oError) {
-                    // Fallback for testing when backend is unavailable
-                    MessageToast.show("Backend unavailable. Logging in as verify user.");
-                    console.error("Login failed:", oError);
-                    this.getRouter().navTo("RouteDashboard");
-                }.bind(this)
-            });
+                    }.bind(this),
+                    error: function (oError) {
+                        // Fallback for testing when backend is unavailable
+                        MessageToast.show("Backend unavailable. Logging in as verify user.");
+                        console.error("Login failed:", oError);
+                        this.getRouter().navTo("RouteDashboard");
+                    }.bind(this)
+                });
+            } catch (error) {
+                MessageToast.show("Error initiating login. Entering offline mode.");
+                console.error("Critical error in OData read:", error);
+                this.getRouter().navTo("RouteDashboard");
+            }
         },
 
         getRouter: function () {
