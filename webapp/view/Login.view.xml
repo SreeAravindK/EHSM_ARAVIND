@@ -1,0 +1,22 @@
+<mvc:View controllerName="ehsm.controller.Login"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    displayBlock="true">
+    <Page id="loginPage" title="EHSM Portal Login" showHeader="false">
+        <content>
+            <FlexBox alignItems="Center" justifyContent="Center" height="100%" direction="Column">
+                <items>
+                    <Image src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg" width="100px" class="sapUiSmallMarginBottom" />
+                    <Title text="EHSM Portal" level="H1" titleStyle="H1" class="sapUiMediumMarginBottom" />
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Employee ID" labelFor="employeeIdInput" />
+                        <Input id="employeeIdInput" placeholder="Enter Employee ID" width="300px" />
+                        <Label text="Password" labelFor="passwordInput" class="sapUiSmallMarginTop" />
+                        <Input id="passwordInput" type="Password" placeholder="Enter Password" width="300px" />
+                        <Button text="Login" type="Emphasized" press=".onLogin" width="300px" class="sapUiMediumMarginTop" />
+                    </VBox>
+                </items>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

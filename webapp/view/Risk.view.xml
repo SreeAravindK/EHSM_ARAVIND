@@ -1,0 +1,60 @@
+<mvc:View controllerName="ehsm.controller.Risk"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    displayBlock="true">
+    <Page id="riskPage" title="Risk Assessment" showNavButton="true" navButtonPress=".onNavBack">
+        <content>
+            <Table id="riskTable" items="{path: '/riskSet'}" mode="None" class="sapUiResponsiveMargin">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="Risks" level="H2" />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="Risk ID" />
+                    </Column>
+                    <Column>
+                        <Text text="Plant" />
+                    </Column>
+                    <Column>
+                        <Text text="Description" />
+                    </Column>
+                    <Column>
+                        <Text text="Category" />
+                    </Column>
+                    <Column>
+                        <Text text="Severity" />
+                    </Column>
+                    <Column>
+                        <Text text="Likelihood" />
+                    </Column>
+                    <Column>
+                        <Text text="Mitigation Measures" />
+                    </Column>
+                    <Column>
+                        <Text text="Created By" />
+                    </Column>
+                    <Column>
+                        <Text text="Identified On" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{RiskId}" />
+                            <Text text="{Plant}" />
+                            <Text text="{Description}" />
+                            <Text text="{Category}" />
+                            <Text text="{Severity}" />
+                            <Text text="{Likelihood}" />
+                            <Text text="{MitigationMeasures}" />
+                            <Text text="{CreatedBy}" />
+                            <Text text="{IdentificationDate}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

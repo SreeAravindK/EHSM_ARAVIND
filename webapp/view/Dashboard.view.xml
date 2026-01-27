@@ -1,0 +1,24 @@
+<mvc:View controllerName="ehsm.controller.Dashboard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout">
+    <Page id="dashboardPage" title="Dashboard">
+        <headerContent>
+            <Button text="Logout" icon="sap-icon://log" press=".onLogout" />
+        </headerContent>
+        <content>
+            <l:Grid defaultSpan="L6 M6 S12" class="sapUiSmallMargin">
+                <GenericTile header="Incident Management" subheader="View and Manage Incidents" press=".onNavToIncident" class="sapUiMediumMarginBegin">
+                    <TileContent>
+                        <ImageContent src="sap-icon://incident" />
+                    </TileContent>
+                </GenericTile>
+                <GenericTile header="Risk Assessment" subheader="Monitor and Manage Risks" press=".onNavToRisk" class="sapUiMediumMarginBegin">
+                    <TileContent>
+                        <ImageContent src="sap-icon://risk" />
+                    </TileContent>
+                </GenericTile>
+            </l:Grid>
+        </content>
+    </Page>
+</mvc:View>
