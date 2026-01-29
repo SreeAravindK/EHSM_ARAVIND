@@ -1,13 +1,14 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageToast",
+    "sap/m/MessageBox",
     "sap/ui/core/UIComponent"
-], function (Controller, MessageToast, UIComponent) {
+], function (Controller, MessageToast, MessageBox, UIComponent) {
     "use strict";
 
     return Controller.extend("ehsm.controller.Login", {
         onInit: function () {
-            // Initialization logic if needed...
+            // Initialization logic
         },
 
         onLogin: function () {
@@ -19,77 +20,58 @@ sap.ui.define([
                 return;
             }
 
-            var oModel = this.getOwnerComponent().getModel(); // Default model ZEHSM1_SRV
-            var sPath = "/LoginSet(EmployeeId='" + sEmployeeId + "',Password='" + sPassword + "')";
-
-            // Assuming that LoginSet is an EntitySet and we are reading a single entity or using a function import.
-            // Based on the user instruction: "Call /LoginSet. Check Status === 'Success'".
-            // Usually, this would involve a create or a read with a specific key or a function import.
-            // Since it mentions Status === 'Success', I'll assume we read an entity or create one.
-            // Let's assume reading by key first, as it's cleaner for RESTful OData. 
-            // However, a password in the key is bad practice, but I must follow instructions.
-            // If it's a function import, we would use callFunction.
-            // Given "Call /LoginSet", I will try a read with filters or just keys if possible.
-            // The user didn't specify the key structure of LoginSet.
-            // I'll assume it's a READ operation with keys.
-
-            // To be safe and more aligned with common practices if the user didn't specify keys:
-            // I'll use a filter or key read.
-            // If the user meant a Function Import, it would be different.
-            // Let's try to fetch a specific record. 
-
-            // Actually, best guess: A read with filters? Or keys?
-            // "Call /LoginSet" could mean reading the set.
-            // Let's perform a read with filters to find the user.
-
+            var oModel = this.getOwnerComponent().getModel();
             var aFilters = [
                 new sap.ui.model.Filter("EmployeeId", sap.ui.model.FilterOperator.EQ, sEmployeeId),
                 new sap.ui.model.Filter("Password", sap.ui.model.FilterOperator.EQ, sPassword)
             ];
 
-            // --- OFFLINE / FALLBACK CHECK ---
-            // If the service is known to be down (503), the model might not even process the read directly or metadata might have failed.
-            // We check if the metadata is loaded or if we should just force it for testing.
+            sap.ui.core.BusyIndicator.show(0);
 
-            // Check if metadata is loaded. If not, and we want to test UI, we just navigate.
-            var oMetadata = oModel.getServiceMetadata();
-            if (!oMetadata) {
-                // Metadata not loaded yet or failed.
-                MessageToast.show("Backend Metadata not loaded. Logging in as offline user.");
-                console.warn("Metadata invalid or not loaded. Skipping OData read.");
-                this.getRouter().navTo("RouteDashboard");
-                return;
-            }
+            oModel.read("/LoginSet", {
+                filters: aFilters,
+                success: function (oData) {
+                    sap.ui.core.BusyIndicator.hide();
 
-            try {
-                oModel.read("/LoginSet", {
-                    filters: aFilters,
-                    success: function (oData) {
-                        // Check if we got any results and if the status is success
-                        if (oData.results && oData.results.length > 0) {
-                            var oUser = oData.results[0];
-                            if (oUser.Status === 'Success') {
-                                MessageToast.show("Login Successful");
-                                this.getRouter().navTo("RouteDashboard");
-                            } else {
-                                MessageToast.show("Login Failed: " + (oUser.Message || "Invalid Credentials"));
-                            }
-                        } else {
-                            MessageToast.show("Login Failed: User not found or invalid credentials.");
-                        }
-                    }.bind(this),
-                    error: function (oError) {
-                        // Fallback for testing when backend is unavailable
-                        MessageToast.show("Backend unavailable. Logging in as verify user.");
-                        console.error("Login failed:", oError);
+                    var aResults = (oData && oData.results) ? oData.results : [];
+                    console.log("Login Results from backend:", aResults);
+
+                    // Strict validation: check both ID and Password from the returned data
+                    // We normalize the ID by removing leading zeros just in case one is padded and the other isn't
+                    var oUser = aResults.find(function (user) {
+                        var sNormalizedInputId = sEmployeeId.toString().replace(/^0+/, '');
+                        var sNormalizedRecordId = (user.EmployeeId || "").toString().replace(/^0+/, '');
+
+                        return sNormalizedRecordId === sNormalizedInputId &&
+                            user.Password === sPassword &&
+                            user.Status === 'Success';
+                    });
+
+                    if (oUser) {
+                        MessageToast.show("Login Successful");
                         this.getRouter().navTo("RouteDashboard");
-                    }.bind(this)
-                });
-            } catch (error) {
-                MessageToast.show("Error initiating login. Entering offline mode.");
-                console.error("Critical error in OData read:", error);
-                this.getRouter().navTo("RouteDashboard");
-            }
+                    } else {
+                        console.error("Login Failed: No matching user found in results.");
+                        MessageBox.error("Login Failed: Invalid Credentials or unauthorized access.");
+                    }
+                }.bind(this),
+                error: function (oError) {
+                    sap.ui.core.BusyIndicator.hide();
+                    console.error("Login Error Details:", oError);
+                    var sErrorMsg = "Connection Error (" + oError.statusCode + " " + oError.statusText + "): ";
+                    try {
+                        var oResponse = JSON.parse(oError.responseText);
+                        sErrorMsg += oResponse.error.message.value;
+                    } catch (e) {
+                        if (oError.statusCode === 0) {
+                            sErrorMsg += "The backend service is unreachable. This usually means you are not on the correct VPN/network or the server is down.";
+                        } else {
+                            sErrorMsg += "The backend returned an error. Please check the network tab for details.";
+                        }
+                    }
+                    MessageBox.error(sErrorMsg);
+                }.bind(this)
+            });
         },
 
         getRouter: function () {

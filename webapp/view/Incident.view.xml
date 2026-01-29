@@ -41,11 +41,11 @@
                         <cells>
                             <Text text="{IncidentId}" />
                             <Text text="{Plant}" />
-                            <Text text="{Description}" />
-                            <Text text="{Category}" />
-                            <Text text="{Priority}" />
-                            <Text text="{Status}" />
-                            <Text text="{Date}" />
+                            <Text text="{IncidentDescription}" />
+                            <Text text="{IncidentCategory}" />
+                            <Text text="{IncidentPriority}" />
+                            <Text text="{IncidentStatus}" />
+                            <Text text="{IncidentDate}" />
                             <Text text="{CreatedBy}" />
                         </cells>
                     </ColumnListItem>

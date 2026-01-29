@@ -32,7 +32,8 @@ server:
         backend:
           - path: /sap
             url: http://172.17.19.24:8000
-            destination: EHSMPORT
+            secure: false
+            ignoreCertErrors: true
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:

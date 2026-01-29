@@ -17,8 +17,9 @@ server:
           url: https://ui5.sap.com
         backend:
           - path: /sap
-            # url: http://172.17.19.24:8000
-            destination: EHSMPORT
+            url: http://172.17.19.24:8000
+            secure: false
+            ignoreCertErrors: true
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:

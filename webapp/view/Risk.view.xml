@@ -44,13 +44,13 @@
                         <cells>
                             <Text text="{RiskId}" />
                             <Text text="{Plant}" />
-                            <Text text="{Description}" />
-                            <Text text="{Category}" />
-                            <Text text="{Severity}" />
+                            <Text text="{RiskDescription}" />
+                            <Text text="{RiskCategory}" />
+                            <Text text="{RiskSeverity}" />
                             <Text text="{Likelihood}" />
                             <Text text="{MitigationMeasures}" />
                             <Text text="{CreatedBy}" />
-                            <Text text="{IdentificationDate}" />
+                            <Text text="{RiskIdentificationDate}" />
                         </cells>
                     </ColumnListItem>
                 </items>
