@@ -21,6 +21,9 @@ server:
             client: '100'
             secure: false
             ignoreCertErrors: true
+            headers:
+              Accept: "application/json"
+              Content-Type: "application/json"
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
